@@ -1,9 +1,5 @@
 #include "vtkPolyDataToGraph.h"
 
-//for testing only
-#include "vtkXMLPolyDataWriter.h"
-
-#include "vtkGraphToPolyData.h"
 #include "vtkFloatArray.h"
 #include "vtkPointData.h"
 #include "vtkExtractEdges.h"
@@ -64,7 +60,6 @@ int vtkPolyDataToGraph::RequestData(
   vtkPolyData* input = vtkPolyData::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
   
-  std::cout << "vtkPolyDataToGraph: Input has " << input->GetNumberOfPoints() << " points." << std::endl;
   
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkMutableUndirectedGraph *output = vtkMutableUndirectedGraph::SafeDownCast(
@@ -102,16 +97,6 @@ int vtkPolyDataToGraph::RequestData(
       vtkSmartPointer<vtkMutableUndirectedGraph>::New();
   outputGraph->ShallowCopy(output);
   
-  vtkSmartPointer<vtkGraphToPolyData> graphToPolyData = 
-      vtkSmartPointer<vtkGraphToPolyData>::New();
-  graphToPolyData->SetInput(outputGraph);
-  graphToPolyData->Update();
-      
-  vtkSmartPointer<vtkXMLPolyDataWriter> writer = 
-    vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-  writer->SetFileName("MeshToGraphOutput.vtp");
-  writer->SetInputConnection(graphToPolyData->GetOutputPort());
-  writer->Write();
   }
 
   return 1;
