@@ -14,7 +14,6 @@
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPolyDataToGraph, "$Revision: 1.70 $");
 vtkStandardNewMacro(vtkPolyDataToGraph);
 
 int vtkPolyDataToGraph::RequestDataObject(vtkInformation *vtkNotUsed(request),
