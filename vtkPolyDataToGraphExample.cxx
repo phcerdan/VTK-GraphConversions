@@ -15,7 +15,7 @@ int main (int argc, char *argv[])
 {
   ExampleWithMesh();
   ExampleWithEdges();
-  
+
   return EXIT_SUCCESS;
 }
 
@@ -30,12 +30,12 @@ void ExampleWithMesh()
   vtkSmartPointer<vtkXMLPolyDataWriter> inputWriter =
     vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   inputWriter->SetFileName("meshInput.vtp");
-  inputWriter->SetInputConnection(input->GetProducerPort());
+  inputWriter->SetInputData(input);
   inputWriter->Write();
 
   vtkSmartPointer<vtkPolyDataToGraph> polyDataToGraphFilter =
       vtkSmartPointer<vtkPolyDataToGraph>::New();
-  polyDataToGraphFilter->SetInputConnection(input->GetProducerPort());
+  polyDataToGraphFilter->SetInputData(input);
   polyDataToGraphFilter->Update();
 
   vtkSmartPointer<vtkGraphToPolyData> graphToPolyDataFilter =
@@ -66,12 +66,12 @@ void ExampleWithEdges()
   vtkSmartPointer<vtkXMLPolyDataWriter> inputWriter =
     vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   inputWriter->SetFileName("edgesInput.vtp");
-  inputWriter->SetInputConnection(input->GetProducerPort());
+  inputWriter->SetInputData(input);
   inputWriter->Write();
 
   vtkSmartPointer<vtkPolyDataToGraph> polyDataToGraphFilter =
       vtkSmartPointer<vtkPolyDataToGraph>::New();
-  polyDataToGraphFilter->SetInputConnection(input->GetProducerPort());
+  polyDataToGraphFilter->SetInputData(input);
   polyDataToGraphFilter->Update();
 
   vtkSmartPointer<vtkGraphToPolyData> graphToPolyDataFilter =

@@ -10,16 +10,16 @@
 
 int main (int argc, char *argv[])
 {
-  vtkSmartPointer<vtkSphereSource> sphereSource = 
+  vtkSmartPointer<vtkSphereSource> sphereSource =
       vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->Update();
-    
-  vtkSmartPointer<vtkExtractEdges> extractEdges = 
+
+  vtkSmartPointer<vtkExtractEdges> extractEdges =
       vtkSmartPointer<vtkExtractEdges>::New();
   extractEdges->SetInputConnection(sphereSource->GetOutputPort());
   extractEdges->Update();
 
-  vtkSmartPointer<vtkPolyDataToGraph> polyDataToGraphFilter = 
+  vtkSmartPointer<vtkPolyDataToGraph> polyDataToGraphFilter =
       vtkSmartPointer<vtkPolyDataToGraph>::New();
   polyDataToGraphFilter->SetInputConnection(extractEdges->GetOutputPort());
   polyDataToGraphFilter->Update();
@@ -37,6 +37,6 @@ int main (int argc, char *argv[])
       << " does not match number of edges " << polyDataToGraphFilter->GetOutput()->GetNumberOfEdges() << " !";
     return EXIT_FAILURE;
     }
-  
+
   return EXIT_SUCCESS;
 }

@@ -22,7 +22,7 @@ int vtkPolyDataToGraph::RequestDataObject(vtkInformation *vtkNotUsed(request),
 {
   vtkMutableUndirectedGraph* output = 0;
   output = vtkMutableUndirectedGraph::New();
-    
+
   this->GetExecutive()->SetOutputData(0, output);
   output->Delete();
 
@@ -58,44 +58,44 @@ int vtkPolyDataToGraph::RequestData(
   //vtkPolyData *input = vtkPolyData::SafeDownCast(
   vtkPolyData* input = vtkPolyData::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  
-  
+
+
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkMutableUndirectedGraph *output = vtkMutableUndirectedGraph::SafeDownCast(
 		  outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  
+
   //add a vertex for every point
   for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
     {
     output->AddVertex();
     }
-  
+
   //output->GetVertexData()->ShallowCopy(input->GetPointData());
   output->GetVertexData()->PassData(input->GetPointData());
-  
+
   //add the edge between every point and every point connected to it (do not allow duplicates)
   for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
     {
-    vtkSmartPointer<vtkIdList> idList = 
+    vtkSmartPointer<vtkIdList> idList =
         vtkSmartPointer<vtkIdList>::New();
     this->GetConnectedVertices(input, i, idList);
-    
+
     for(vtkIdType id = 0; id < idList->GetNumberOfIds(); id++)
       {
       if(!EdgeExists(output, i, idList->GetId(id)))
         {
         output->AddEdge(i, idList->GetId(id));
         }
-      }  
+      }
     }
-  
+
   output->SetPoints(input->GetPoints());
-    
+
   {
-  vtkSmartPointer<vtkMutableUndirectedGraph> outputGraph = 
+  vtkSmartPointer<vtkMutableUndirectedGraph> outputGraph =
       vtkSmartPointer<vtkMutableUndirectedGraph>::New();
   outputGraph->ShallowCopy(output);
-  
+
   }
 
   return 1;
@@ -104,10 +104,10 @@ int vtkPolyDataToGraph::RequestData(
 bool vtkPolyDataToGraph::EdgeExists(vtkSmartPointer<vtkGraph> g, int pointID, int neighborID)
 {
   //check if the edge already exists
-  vtkSmartPointer<vtkAdjacentVertexIterator> iterator = 
+  vtkSmartPointer<vtkAdjacentVertexIterator> iterator =
       vtkSmartPointer<vtkAdjacentVertexIterator>::New();
   g->GetAdjacentVertices(pointID, iterator);
-  
+
   bool edgeExists = false;
   while(iterator->HasNext())
     {
@@ -123,24 +123,24 @@ bool vtkPolyDataToGraph::EdgeExists(vtkSmartPointer<vtkGraph> g, int pointID, in
 
 void vtkPolyDataToGraph::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, int seed, vtkSmartPointer<vtkIdList> connectedVertices)
 {
-  
+
   //get all cells that vertex 'seed' is a part of
-  vtkSmartPointer<vtkIdList> cellIdList = 
+  vtkSmartPointer<vtkIdList> cellIdList =
       vtkSmartPointer<vtkIdList>::New();
   mesh->GetPointCells(seed, cellIdList);
-  
+
   //cout << "There are " << cellIdList->GetNumberOfIds() << " cells that use point " << seed << endl;
-      
+
   //loop through all the cells that use the seed point
   for(vtkIdType i = 0; i < cellIdList->GetNumberOfIds(); i++)
     {
 
     vtkCell* cell = mesh->GetCell(cellIdList->GetId(i));
     //cout << "The cell has " << cell->GetNumberOfEdges() << " edges." << endl;
-    
+
     //if the cell doesn't have any edges, it is a line
     if(cell->GetNumberOfEdges() <= 0)
-      {      
+      {
       //vtkLine* line = vtkLine::SafeDownCast(input->GetCell(i));
       vtkLine* line = vtkLine::SafeDownCast(mesh->GetCell(cellIdList->GetId(i)));
 
@@ -161,11 +161,11 @@ void vtkPolyDataToGraph::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh,
           {
           connectedVertices->InsertNextId(p0);
           }
-        
+
         }
         continue;
       }
-      
+
     //if we get to here, the cell is a polygon, so extract its border edges
     for(vtkIdType e = 0; e < cell->GetNumberOfEdges(); e++)
       {
@@ -191,7 +191,7 @@ void vtkPolyDataToGraph::GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh,
           }
         }
       }
-    
+
 
     }
 

@@ -36,7 +36,8 @@ int main (int argc, char *argv[])
   if(unstructuredGridToGraphFilter->GetOutput()->GetNumberOfEdges() != 234)
     {
     std::cerr << "Number of edges " << unstructuredGridToGraphFilter->GetOutput()->GetNumberOfEdges()
-      << " is not correct (should be 234)!" << std::endl;
+      << " is not correct (should be 234)!"
+      << " This was hard coded, I am getting 250, change in vtkDelaunay3D in 5 years?!" << std::endl;
     return EXIT_FAILURE;
     }
 

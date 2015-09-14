@@ -14,30 +14,30 @@ class vtkGraph;
 class vtkUnstructuredGridToGraph : public vtkGraphAlgorithm
 {
 public:
-  
+
   vtkTypeRevisionMacro(vtkUnstructuredGridToGraph, vtkGraphAlgorithm);
   static vtkUnstructuredGridToGraph* New();
-  
+
 protected:
   vtkUnstructuredGridToGraph(){}
   ~vtkUnstructuredGridToGraph(){}
-  
+
   virtual int FillInputPortInformation( int port, vtkInformation* info );
-  
+
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  
+
   int RequestDataObject(vtkInformation *vtkNotUsed(request),
                                          vtkInformationVector **inputVector,
                                          vtkInformationVector *outputVector);
-  
+
   static void ProgressFunction(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
-  
+
 private:
   vtkUnstructuredGridToGraph(const vtkUnstructuredGridToGraph&);  // Not implemented.
   void operator=(const vtkUnstructuredGridToGraph&);  // Not implemented.
-  
+
   //should not be part of this class
-  bool EdgeExists(vtkSmartPointer<vtkGraph> g, int pointID, int neighborID);  
+  bool EdgeExists(vtkSmartPointer<vtkGraph> g, int pointID, int neighborID);
   void GetConnectedVertices(vtkSmartPointer<vtkUnstructuredGrid> mesh, int seed, vtkSmartPointer<vtkIdList> connectedVertices);
 };
 
