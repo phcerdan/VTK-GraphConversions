@@ -32,12 +32,13 @@
 // .SECTION See Also
 // vtkGraph vtkMutableDirectedGraph
 
-#ifndef __vtkDirectedGraph_h
-#define __vtkDirectedGraph_h
+#ifndef vtkDirectedGraph_h
+#define vtkDirectedGraph_h
 
+#include "vtkCommonDataModelModule.h" // For export macro
 #include "vtkGraph.h"
 
-class VTK_FILTERING_EXPORT vtkDirectedGraph : public vtkGraph
+class VTKCOMMONDATAMODEL_EXPORT vtkDirectedGraph : public vtkGraph
 {
 public:
   static vtkDirectedGraph *New();
@@ -57,7 +58,8 @@ public:
 
   // Description:
   // Check the storage, and accept it if it is a valid
-  // undirected graph.
+  // undirected graph. This is public to allow
+  // the ToDirected/UndirectedGraph to work.
   virtual bool IsStructureValid(vtkGraph *g);
 
 protected:

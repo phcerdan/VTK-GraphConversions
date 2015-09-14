@@ -199,15 +199,17 @@
 // Laboratories and Douglas Gregor of Indiana University for designing these
 // classes.
 
-#ifndef __vtkGraph_h
-#define __vtkGraph_h
+#ifndef vtkGraph_h
+#define vtkGraph_h
 
+#include "vtkCommonDataModelModule.h" // For export macro
 #include "vtkDataObject.h"
 
 class vtkAdjacentVertexIterator;
 class vtkCellArray;
 class vtkEdgeListIterator;
 class vtkDataSetAttributes;
+class vtkDirectedGraph;
 class vtkGraphEdge;
 class vtkGraphEdgePoints;
 class vtkDistributedGraphHelper;
@@ -216,12 +218,10 @@ class vtkIdTypeArray;
 class vtkInEdgeIterator;
 class vtkOutEdgeIterator;
 class vtkPoints;
+class vtkUndirectedGraph;
 class vtkVertexListIterator;
 class vtkVariant;
 class vtkVariantArray;
-
-class vtkDirectedGraph;
-class vtkUndirectedGraph;
 
 //BTX
 // Forward declare some boost stuff even if boost wrappers
@@ -272,7 +272,7 @@ struct vtkEdgeType : vtkEdgeBase
 };
 //ETX
 
-class VTK_FILTERING_EXPORT vtkGraph : public vtkDataObject
+class VTKCOMMONDATAMODEL_EXPORT vtkGraph : public vtkDataObject
 {
 public:
   vtkTypeMacro(vtkGraph, vtkDataObject);
@@ -461,7 +461,7 @@ public:
   // returns false.
   virtual bool CheckedDeepCopy(vtkGraph *g);
 
-  // Decription:
+  // Description:
   // Reclaim unused memory.
   virtual void Squeeze();
 
@@ -564,11 +564,20 @@ public:
   void Dump();
 
   // Description:
-  // Convert graph to a directed graph
+  // Returns the Id of the edge between vertex a and vertex b.
+  // This is independent of directionality of the edge, that is,
+  // if edge A->B exists or if edge B->A exists, this function will
+  // return its Id. If multiple edges exist between a and b, here is no guarantee
+  // about which one will be returned.
+  // Returns -1 if no edge exists between a and b.
+  vtkIdType GetEdgeId(vtkIdType a, vtkIdType b);
+
+  // Description:
+  // Convert the graph to a directed graph.
   bool ToDirectedGraph(vtkDirectedGraph* g);
 
   // Description:
-  // Convert graph to an undirected graph
+  // Convert the graph to an undirected graph.
   bool ToUndirectedGraph(vtkUndirectedGraph* g);
 
 protected:
@@ -669,9 +678,9 @@ protected:
   // Builds a mapping from edge id to source/target vertex id.
   void BuildEdgeList();
 
+  //BTX
   // Description:
   // Friend iterator classes.
-  //BTX
   friend class vtkAdjacentVertexIterator;
   friend class vtkEdgeListIterator;
   friend class vtkInEdgeIterator;
@@ -711,9 +720,9 @@ private:
 };
 
 //BTX
-bool VTK_FILTERING_EXPORT operator==(vtkEdgeBase e1, vtkEdgeBase e2);
-bool VTK_FILTERING_EXPORT operator!=(vtkEdgeBase e1, vtkEdgeBase e2);
-VTK_FILTERING_EXPORT ostream& operator<<(ostream& out, vtkEdgeBase e);
+bool VTKCOMMONDATAMODEL_EXPORT operator==(vtkEdgeBase e1, vtkEdgeBase e2);
+bool VTKCOMMONDATAMODEL_EXPORT operator!=(vtkEdgeBase e1, vtkEdgeBase e2);
+VTKCOMMONDATAMODEL_EXPORT ostream& operator<<(ostream& out, vtkEdgeBase e);
 //ETX
 
 #endif

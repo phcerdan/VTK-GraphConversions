@@ -19,14 +19,11 @@
 -------------------------------------------------------------------------*/
 
 #include "vtkGraph.h"
-#include "vtkUndirectedGraph.h"
-#include "vtkMutableUndirectedGraph.h"
-#include "vtkDirectedGraph.h"
-#include "vtkMutableDirectedGraph.h"
 
 #include "vtkAdjacentVertexIterator.h"
 #include "vtkCellArray.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkDirectedGraph.h"
 #include "vtkDistributedGraphHelper.h"
 #include "vtkEdgeListIterator.h"
 #include "vtkGraphEdge.h"
@@ -36,15 +33,18 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMutableDirectedGraph.h"
+#include "vtkMutableUndirectedGraph.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutEdgeIterator.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
+#include "vtkUndirectedGraph.h"
 #include "vtkVertexListIterator.h"
 #include "vtkVariantArray.h"
 #include "vtkStringArray.h"
 
-#include <assert.h>
+#include <cassert>
 #include <vtksys/stl/algorithm>
 #include <vtksys/stl/set>
 #include <vtksys/stl/vector>
@@ -185,13 +185,16 @@ void vtkGraph::ComputeBounds()
 
   if ( this->Points )
     {
-    bounds = this->Points->GetBounds();
-    for (int i=0; i<6; i++)
+    if ( this->GetMTime() >= this->ComputeTime )
       {
-      this->Bounds[i] = bounds[i];
+      bounds = this->Points->GetBounds();
+      for (int i=0; i<6; i++)
+        {
+        this->Bounds[i] = bounds[i];
+        }
+      // TODO: how to compute the bounds for a distributed graph?
+      this->ComputeTime.Modified();
       }
-    // TODO: how to compute the bounds for a distributed graph?
-    this->ComputeTime.Modified();
     }
 }
 
@@ -260,8 +263,6 @@ void vtkGraph::GetOutEdges(vtkIdType v, vtkOutEdgeIterator *it)
     if (myRank != helper->GetVertexOwner(v))
       {
       vtkErrorMacro("vtkGraph cannot retrieve the out edges for non-local vertex " << v);
-      int* p = 0;
-      *p = 17;
       return;
       }
     }
@@ -282,8 +283,6 @@ vtkOutEdgeType vtkGraph::GetOutEdge(vtkIdType v, vtkIdType i)
     if (myRank != helper->GetVertexOwner(v))
       {
       vtkErrorMacro("vtkGraph cannot retrieve the out edges for non-local vertex " << v);
-      int* p = 0;
-      *p = 17;
       return vtkOutEdgeType();
       }
     index = helper->GetVertexIndex(v);
@@ -316,8 +315,6 @@ void vtkGraph::GetOutEdges(vtkIdType v, const vtkOutEdgeType *& edges, vtkIdType
     if (myRank != helper->GetVertexOwner(v))
       {
       vtkErrorMacro("vtkGraph cannot retrieve the out edges for non-local vertex " << v);
-      int* p = 0;
-      *p = 17;
       return;
       }
 
@@ -1456,7 +1453,10 @@ void vtkGraph::RemoveVertexInternal(vtkIdType v, bool directed)
     }
 
   this->ForceOwnership();
-  this->BuildEdgeList(); // This function assumes the edge list is created.
+  if (!this->EdgeList)
+    {
+    this->BuildEdgeList();
+    }
 
   // Remove connected edges
   vtksys_stl::set<vtkIdType> edges;
@@ -1479,7 +1479,7 @@ void vtkGraph::RemoveVertexInternal(vtkIdType v, bool directed)
     this->RemoveEdgeInternal(*ei, directed);
     }
 
-  // Replace all occurences of last vertex id with v
+  // Replace all occurrences of last vertex id with v
   vtkIdType lv = this->GetNumberOfVertices() - 1;
   this->Internals->Adjacency[v] = this->Internals->Adjacency[lv];
   oiEnd = this->Internals->Adjacency[v].OutEdges.end();
@@ -1555,6 +1555,7 @@ void vtkGraph::RemoveVertexInternal(vtkIdType v, bool directed)
     {
     double x[3];
     this->Points->GetPoint(lv, x);
+//    this->Points->GetPoint(lv);
     this->Points->SetPoint(v, x);
     this->Points->SetNumberOfPoints(lv);
     }
@@ -1791,10 +1792,8 @@ vtkFieldData* vtkGraph::GetAttributesAsFieldData(int type)
     {
     case VERTEX:
       return this->GetVertexData();
-      break;
     case EDGE:
       return this->GetEdgeData();
-      break;
     }
   return this->Superclass::GetAttributesAsFieldData(type);
 }
@@ -1806,10 +1805,8 @@ vtkIdType vtkGraph::GetNumberOfElements(int type)
     {
     case VERTEX:
       return this->GetNumberOfVertices();
-      break;
     case EDGE:
       return this->GetNumberOfEdges();
-      break;
     }
   return this->Superclass::GetNumberOfElements(type);;
 }
@@ -1847,13 +1844,48 @@ void vtkGraph::Dump()
 }
 
 //----------------------------------------------------------------------------
+vtkIdType vtkGraph::GetEdgeId(vtkIdType a, vtkIdType b)
+{
+  // Check if there is an edge from b to a
+  vtkSmartPointer<vtkInEdgeIterator> inEdgeIterator =
+    vtkSmartPointer<vtkInEdgeIterator>::New();
+  this->GetInEdges(a, inEdgeIterator);
+
+  while(inEdgeIterator->HasNext())
+    {
+    vtkInEdgeType edge = inEdgeIterator->Next();
+    if(edge.Source == b)
+      {
+      return edge.Id;
+      }
+    }
+
+  // Check if there is an edge from a to b
+  vtkSmartPointer<vtkOutEdgeIterator> outEdgeIterator =
+    vtkSmartPointer<vtkOutEdgeIterator>::New();
+  this->GetOutEdges(a, outEdgeIterator);
+
+  while(outEdgeIterator->HasNext())
+    {
+    vtkOutEdgeType edge = outEdgeIterator->Next();
+    if(edge.Target == b)
+      {
+      return edge.Id;
+      }
+    }
+
+  return -1;
+}
+
+
+//----------------------------------------------------------------------------
 bool vtkGraph::ToDirectedGraph(vtkDirectedGraph* g)
 {
   // This function will convert a vtkUndirectedGraph to a
   // vtkDirectedGraph. It copies all of the data associated
   // with the graph by calling CopyInternal. Only one directed
   // edge is added for each input undirected edge.
-  
+
   if(this->IsA("vtkDirectedGraph"))
     {
     // Return the status of CheckedShallowCopy
@@ -1874,7 +1906,7 @@ bool vtkGraph::ToDirectedGraph(vtkDirectedGraph* g)
       {
       m->AddEdge(this->GetSourceVertex(i), this->GetTargetVertex(i));
       }
-      
+
     if(g->IsStructureValid(m))
       {
       // Force full copy from this, internals will be invalid
@@ -1894,8 +1926,6 @@ bool vtkGraph::ToDirectedGraph(vtkDirectedGraph* g)
     g = NULL;
     return false;
     }
-    
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1904,7 +1934,7 @@ bool vtkGraph::ToUndirectedGraph(vtkUndirectedGraph* g)
   // This function will convert a vtkDirectedGraph to a
   // vtkUndirectedGraph. It copies all of the data associated
   // with the graph by calling CopyInternal
-  
+
   if(this->IsA("vtkUndirectedGraph"))
     {
     // A normal CheckedShallowCopy will work fine.
@@ -1925,7 +1955,7 @@ bool vtkGraph::ToUndirectedGraph(vtkUndirectedGraph* g)
       {
       m->AddEdge(this->GetSourceVertex(i), this->GetTargetVertex(i));
       }
-    
+
     if(g->IsStructureValid(m))
       {
       // Force full copy from this, internals will be invalid
@@ -1933,7 +1963,7 @@ bool vtkGraph::ToUndirectedGraph(vtkUndirectedGraph* g)
 
       // Make internals valid
       g->SetInternals(m->Internals);
-    
+
       return true;
       }
     else

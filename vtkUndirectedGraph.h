@@ -21,10 +21,10 @@
 //
 // .SECTION Description
 // vtkUndirectedGraph is a collection of vertices along with a collection of
-// undirected edges (they connect two vertices in no particular order). 
+// undirected edges (they connect two vertices in no particular order).
 // ShallowCopy(), DeepCopy(), CheckedShallowCopy(), CheckedDeepCopy()
 // accept instances of vtkUndirectedGraph and vtkMutableUndirectedGraph.
-// GetOutEdges(v, it) and GetInEdges(v, it) return the same list of edges, 
+// GetOutEdges(v, it) and GetInEdges(v, it) return the same list of edges,
 // which is the list of all edges which have a v as an endpoint.
 // GetInDegree(v), GetOutDegree(v) and GetDegree(v) all return the full
 // degree of vertex v.
@@ -36,12 +36,13 @@
 // .SECTION See Also
 // vtkGraph vtkMutableUndirectedGraph
 
-#ifndef __vtkUndirectedGraph_h
-#define __vtkUndirectedGraph_h
+#ifndef vtkUndirectedGraph_h
+#define vtkUndirectedGraph_h
 
+#include "vtkCommonDataModelModule.h" // For export macro
 #include "vtkGraph.h"
 
-class VTK_FILTERING_EXPORT vtkUndirectedGraph : public vtkGraph
+class VTKCOMMONDATAMODEL_EXPORT vtkUndirectedGraph : public vtkGraph
 {
 public:
   static vtkUndirectedGraph *New();
@@ -86,7 +87,8 @@ public:
 
   // Description:
   // Check the structure, and accept it if it is a valid
-  // undirected graph.
+  // undirected graph. This is public to allow
+  // the ToDirected/UndirectedGraph to work.
   virtual bool IsStructureValid(vtkGraph *g);
 
 protected:
