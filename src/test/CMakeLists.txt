@@ -1,0 +1,3 @@
+ADD_EXECUTABLE(vtkPolyDataLinesToGraphTest test_vtkPolyDataLinesToGraph.cxx)
+TARGET_LINK_LIBRARIES(vtkPolyDataLinesToGraphTest vtkPolyDataLinesToGraph )
+ADD_TEST(vtkPolyDataLinesToGraph vtkPolyDataLinesToGraphTest )
