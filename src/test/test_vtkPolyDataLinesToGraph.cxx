@@ -5,38 +5,41 @@
 #include <vtkGraphToPolyData.h>
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkExtractEdges.h>
-
+#include <vtkPoints.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
+#include "gtest/gtest.h"
 #include "vtkPolyDataLinesToGraph.h"
+#include "PolyDataLinesFixture.h"
+#include "common/prog_options_test.h"
 
-int main (int argc, char *argv[])
+/** Flag to visualize results.
+ *  Set at test run-time from command line -v or --visualize. */
+bool VFLAG;
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    auto option_map = program_options(argc, argv);
+    VFLAG = option_map["visualize"].as<bool>();
+    return RUN_ALL_TESTS();
+}
+TEST_F(PolyDataLinesFixture, DataX)
 {
-  vtkSmartPointer<vtkSphereSource> sphereSource =
-      vtkSmartPointer<vtkSphereSource>::New();
-  sphereSource->Update();
+  SetUpPolyDataX();
+  if(VFLAG) VisualizePolyData();
+}
+TEST_F(PolyDataLinesFixture, DataXToGraph)
+{
+  SetUpPolyDataX();
+  // Transform PolyData to Graph
+  vtkSmartPointer<vtkPolyDataLinesToGraph> polyToGraph =
+    vtkSmartPointer<vtkPolyDataLinesToGraph>::New();
+  polyToGraph->SetInputData(polyDataLines_);
+  polyToGraph->Update();
+  graph_ = polyToGraph->GetOutput();
+  int ne = graph_->GetNumberOfEdges();
+  int nv = graph_->GetNumberOfVertices();
+  EXPECT_EQ(ne,2);
+  EXPECT_EQ(nv,4);
 
-  vtkSmartPointer<vtkExtractEdges> extractEdges =
-      vtkSmartPointer<vtkExtractEdges>::New();
-  extractEdges->SetInputConnection(sphereSource->GetOutputPort());
-  extractEdges->Update();
-
-  vtkSmartPointer<vtkPolyDataLinesToGraph> polyDataToGraphFilter =
-      vtkSmartPointer<vtkPolyDataLinesToGraph>::New();
-  polyDataToGraphFilter->SetInputConnection(extractEdges->GetOutputPort());
-  polyDataToGraphFilter->Update();
-
-  if(extractEdges->GetOutput()->GetNumberOfPoints() != polyDataToGraphFilter->GetOutput()->GetNumberOfVertices())
-    {
-    std::cerr << "Number of points " << extractEdges->GetOutput()->GetNumberOfPoints()
-      << " does not match number of vertices " << polyDataToGraphFilter->GetOutput()->GetNumberOfVertices() << " !";
-    return EXIT_FAILURE;
-    }
-
-  if(extractEdges->GetOutput()->GetNumberOfCells() != polyDataToGraphFilter->GetOutput()->GetNumberOfEdges())
-    {
-    std::cerr << "Number of cells(lines) " << extractEdges->GetOutput()->GetNumberOfCells()
-      << " does not match number of edges " << polyDataToGraphFilter->GetOutput()->GetNumberOfEdges() << " !";
-    return EXIT_FAILURE;
-    }
-
-  return EXIT_SUCCESS;
+  if(VFLAG) VisualizeGraph();
 }
