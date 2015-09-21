@@ -21,4 +21,7 @@ target_link_libraries(vtkPolyDataLinesToGraphTestDriven
     ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(vtkPolyDataLinesToGraphTestDriven
     ${Boost_LIBRARIES})
+# TestLibrary
+target_link_libraries(vtkPolyDataLinesToGraphTestDriven
+    graphLayoutView2 graphRepre2 graphToPoly2)
 ADD_TEST(testDriven vtkPolyDataLinesToGraphTestDriven )

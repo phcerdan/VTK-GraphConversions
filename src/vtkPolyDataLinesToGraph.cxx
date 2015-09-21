@@ -13,6 +13,11 @@
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
+#include <vtkCellType.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
+#include <vtkCellIterator.h>
+#include <vtkGraphEdge.h>
 
 vtkStandardNewMacro(vtkPolyDataLinesToGraph);
 
@@ -28,7 +33,6 @@ int vtkPolyDataLinesToGraph::RequestDataObject(vtkInformation *vtkNotUsed(reques
 
   return 1;
 }
-
 /*
 //it works with or without this re-implementation
 int vtkMeshToGraph::FillOutputPortInformation(
@@ -62,39 +66,90 @@ int vtkPolyDataLinesToGraph::RequestData(
   vtkMutableUndirectedGraph *output = vtkMutableUndirectedGraph::SafeDownCast(
 		  outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  //add a vertex for every point
-  for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
+  vtkSmartPointer<vtkCellArray> cellLines =
+    vtkSmartPointer<vtkCellArray>::New();
+  cellLines  = input->GetLines();
+  vtkSmartPointer<vtkIdList> pointsCellLines =
+    vtkSmartPointer<vtkIdList>::New();
+  cellLines->InitTraversal();
+  vtkSmartPointer<vtkPoints> vertexPoints =
+    vtkSmartPointer<vtkPoints>::New();
+
+  while (cellLines->GetNextCell(pointsCellLines))
     {
-    output->AddVertex();
-    }
-
-  //output->GetVertexData()->ShallowCopy(input->GetPointData());
-  output->GetVertexData()->PassData(input->GetPointData());
-
-  //add the edge between every point and every point connected to it (do not allow duplicates)
-  for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
-    {
-    vtkSmartPointer<vtkIdList> idList =
-        vtkSmartPointer<vtkIdList>::New();
-    this->GetConnectedVertices(input, i, idList);
-
-    for(vtkIdType id = 0; id < idList->GetNumberOfIds(); id++)
+    // If >= 2 ids is a well defined line, neccesary?.
+    vtkIdType ini = 0, end = 0;
+    if(pointsCellLines->GetNumberOfIds() >= 2)
       {
-      if(!EdgeExists(output, i, idList->GetId(id)))
+      vtkSmartPointer<vtkPoints> edgePoints =
+        vtkSmartPointer<vtkPoints>::New();
+      for (int n = 0; n < pointsCellLines->GetNumberOfIds(); ++n)
         {
-        output->AddEdge(i, idList->GetId(id));
+        if(n == 0)
+          {
+          ini = output->AddVertex();
+          vertexPoints->InsertNextPoint(
+            input->GetPoint(pointsCellLines->GetId(n)));
+          }
+        else if(n == pointsCellLines->GetNumberOfIds() - 1)
+          {
+          end = output->AddVertex();
+          vertexPoints->InsertNextPoint(
+            input->GetPoint(pointsCellLines->GetId(n)));
+          }
+        else
+          {
+          edgePoints->InsertNextPoint(
+            input->GetPoint(pointsCellLines->GetId(n)));
+          }
         }
+
+      vtkEdgeType edg  = output->AddEdge(ini,end);
+      for (int npe = 0; npe < edgePoints->GetNumberOfPoints(); ++npe)
+        {
+        output->AddEdgePoint(edg.Id,edgePoints->GetPoint(npe));
+        }
+
+      // output->SetEdgePoints(edg.Id,
+      //   edgePoints->GetNumberOfPoints(),
+      //   static_cast<double*>(edgePoints->GetData()->GetVoidPointer(0)));
       }
     }
 
-  output->SetPoints(input->GetPoints());
+  //add a vertex for every point
+  // for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
+  //   {
+  //   output->AddVertex();
+  //   }
+
+  //output->GetVertexData()->ShallowCopy(input->GetPointData());
+  // output->GetVertexData()->PassData(input->GetPointData());
+
+  //add the edge between every point and every point connected to it (do not allow duplicates)
+  // for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
+  //   {
+  //   vtkSmartPointer<vtkIdList> idList =
+  //       vtkSmartPointer<vtkIdList>::New();
+  //   this->GetConnectedVertices(input, i, idList);
+  //
+  //   for(vtkIdType id = 0; id < idList->GetNumberOfIds(); id++)
+  //     {
+  //     if(!EdgeExists(output, i, idList->GetId(id)))
+  //       {
+  //       output->AddEdge(i, idList->GetId(id));
+  //       }
+  //     }
+  //   }
+
+  output->SetPoints(vertexPoints);
+  // output->SetPoints(input->GetPoints());
 
   {
-  //ShallowCopy to check errors:
+  //ShallowCopy to check errors / change type.
   vtkSmartPointer<vtkMutableUndirectedGraph> outputGraph =
       vtkSmartPointer<vtkMutableUndirectedGraph>::New();
   outputGraph->ShallowCopy(output);
-
+  outputGraph->DeepCopyEdgePoints(output);
   }
 
   return 1;
@@ -141,7 +196,7 @@ void vtkPolyDataLinesToGraph::GetConnectedVertices(vtkSmartPointer<vtkPolyData> 
     if(cell->GetNumberOfEdges() <= 0)
       {
       //vtkLine* line = vtkLine::SafeDownCast(input->GetCell(i));
-      vtkLine* line = vtkLine::SafeDownCast(mesh->GetCell(cellIdList->GetId(i)));
+    vtkLine* line = vtkLine::SafeDownCast(mesh->GetCell(cellIdList->GetId(i)));
 
       //if the cell didn't have any edges, and it is not a line, it must be a vertex, so skip it
       if(!line)

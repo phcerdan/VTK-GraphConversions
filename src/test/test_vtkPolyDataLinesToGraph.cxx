@@ -12,7 +12,7 @@
 #include "vtkPolyDataLinesToGraph.h"
 #include "PolyDataLinesFixture.h"
 #include "common/prog_options_test.h"
-
+#include <vtkIntersectionPolyDataFilter.h>
 /** Flag to visualize results.
  *  Set at test run-time from command line -v or --visualize. */
 bool VFLAG;
@@ -25,6 +25,21 @@ int main(int argc, char** argv) {
 TEST_F(PolyDataLinesFixture, DataX)
 {
   SetUpPolyDataX();
+  auto nlines = polyDataLines_->GetNumberOfLines();
+  auto npoints = polyDataLines_->GetNumberOfPoints();
+  EXPECT_EQ(5, npoints);
+  // 2 PolyLines
+  EXPECT_EQ(2, nlines);
+  if(VFLAG) VisualizePolyData();
+}
+TEST_F(PolyDataLinesFixture, DataXWithVertices)
+{
+  SetUpPolyDataX();
+  SetUpVertices();
+  auto nvertices = polyDataLines_->GetNumberOfVerts();
+  EXPECT_EQ(5, nvertices);
+  auto npoints = polyDataLines_->GetNumberOfPoints();
+  EXPECT_EQ(npoints, nvertices);
   if(VFLAG) VisualizePolyData();
 }
 TEST_F(PolyDataLinesFixture, DataXToGraph)
@@ -35,11 +50,15 @@ TEST_F(PolyDataLinesFixture, DataXToGraph)
     vtkSmartPointer<vtkPolyDataLinesToGraph>::New();
   polyToGraph->SetInputData(polyDataLines_);
   polyToGraph->Update();
-  graph_ = polyToGraph->GetOutput();
-  int ne = graph_->GetNumberOfEdges();
-  int nv = graph_->GetNumberOfVertices();
-  EXPECT_EQ(ne,2);
-  EXPECT_EQ(nv,4);
+  graph_  = polyToGraph->GetOutput();
+  int ne  = graph_->GetNumberOfEdges();
+  int nv  = graph_->GetNumberOfVertices();
+  int nep0 = graph_->GetNumberOfEdgePoints(1);
+  int nep1 = graph_->GetNumberOfEdgePoints(0);
+  int nepTotal = nep0 + nep1;
+  EXPECT_EQ(2, ne);
+  EXPECT_EQ(4, nv);
+  EXPECT_EQ(1, nepTotal);
 
   if(VFLAG) VisualizeGraph();
 }

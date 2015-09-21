@@ -18,8 +18,16 @@ find_package(VTK COMPONENTS
 INCLUDE(${VTK_USE_FILE})
 
 message("${VTK_INCLUDE_DIRS}")
-
 include_directories(".")
+# Modified graphLayoutLibraries
+add_library(graphRepre2 vtkRenderedGraphRepresentation2.cxx)
+target_link_libraries(graphRepre2 ${VTK_LIBRARIES})
+add_library(graphToPoly2 vtkGraphToPolyData2.cxx)
+target_link_libraries(graphToPoly2 ${VTK_LIBRARIES})
+add_library(graphLayoutView2 vtkGraphLayoutView2.cxx)
+target_link_libraries(graphLayoutView2 ${VTK_LIBRARIES})
+target_link_libraries(graphLayoutView2 graphRepre2)
+
 add_library(vtkPolyDataLinesToGraph vtkPolyDataLinesToGraph.cxx)
 target_link_libraries(vtkPolyDataLinesToGraph ${VTK_LIBRARIES})
 
