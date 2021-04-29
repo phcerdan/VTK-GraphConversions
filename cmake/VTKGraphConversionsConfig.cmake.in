@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+#### Required dependencies  ####
+find_dependency(VTK REQUIRED COMPONENTS
+  @vtk_required_components@
+  )
+
+get_filename_component(VTKGraphConversions_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+if(NOT TARGET SGCore)
+  include ("${VTKGraphConversions_CMAKE_DIR}/VTKGraphConversionsTargets.cmake")
+endif()
