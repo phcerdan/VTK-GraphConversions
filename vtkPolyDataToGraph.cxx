@@ -17,8 +17,8 @@
 vtkStandardNewMacro(vtkPolyDataToGraph);
 
 int vtkPolyDataToGraph::RequestDataObject(vtkInformation *vtkNotUsed(request),
-                                         vtkInformationVector **inputVector,
-                                         vtkInformationVector *outputVector)
+                                         vtkInformationVector **vtkNotUsed(inputVector),
+                                         vtkInformationVector *vtkNotUsed(outputVector))
 {
   vtkMutableUndirectedGraph* output = 0;
   output = vtkMutableUndirectedGraph::New();

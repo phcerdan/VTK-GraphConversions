@@ -17,8 +17,8 @@
 vtkStandardNewMacro(vtkUnstructuredGridToGraph);
 
 int vtkUnstructuredGridToGraph::RequestDataObject(vtkInformation *vtkNotUsed(request),
-                                         vtkInformationVector **inputVector,
-                                         vtkInformationVector *outputVector)
+                                         vtkInformationVector **vtkNotUsed(inputVector),
+                                         vtkInformationVector *vtkNotUsed(outputVector))
 {
   vtkMutableUndirectedGraph* output = 0;
   output = vtkMutableUndirectedGraph::New();
@@ -29,7 +29,8 @@ int vtkUnstructuredGridToGraph::RequestDataObject(vtkInformation *vtkNotUsed(req
   return 1;
 }
 
-void vtkUnstructuredGridToGraph::ProgressFunction(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData)
+void vtkUnstructuredGridToGraph::ProgressFunction(vtkObject* caller,
+    long unsigned int vtkNotUsed(eventId), void* vtkNotUsed(clientData), void* vtkNotUsed(callData))
 {
   vtkUnstructuredGridToGraph* filter = static_cast<vtkUnstructuredGridToGraph*>(caller);
   cout << "Progress: " << filter->GetProgress() << endl;
