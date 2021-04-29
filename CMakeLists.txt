@@ -1,30 +1,27 @@
 cmake_minimum_required(VERSION 2.6)
 
-PROJECT(GraphConversions)
-ENABLE_TESTING()
+project(VTKGraphConversions)
+enable_testing()
 
-FIND_PACKAGE(VTK REQUIRED)
-INCLUDE(${VTK_USE_FILE})
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
 
-ADD_EXECUTABLE(NewGraphConversions NewGraphConversions.cxx)
-TARGET_LINK_LIBRARIES(NewGraphConversions vtkHybrid )
+add_executable(NewGraphConversions NewGraphConversions.cxx)
+target_link_libraries(NewGraphConversions vtkHybrid )
 
 
-ADD_EXECUTABLE(vtkUnstructuredGridToGraphExample vtkUnstructuredGridToGraphExample.cxx
+add_executable(vtkUnstructuredGridToGraphExample vtkUnstructuredGridToGraphExample.cxx
 vtkUnstructuredGridToGraph.cxx)
-TARGET_LINK_LIBRARIES(vtkUnstructuredGridToGraphExample vtkHybrid )
+target_link_libraries(vtkUnstructuredGridToGraphExample vtkHybrid )
 
-ADD_EXECUTABLE(vtkPolyDataToGraphExample vtkPolyDataToGraphExample.cxx
-vtkPolyDataToGraph.cxx)
-TARGET_LINK_LIBRARIES(vtkPolyDataToGraphExample vtkHybrid )
+add_executable(vtkPolyDataToGraphExample vtkPolyDataToGraphExample.cxx vtkPolyDataToGraph.cxx)
+target_link_libraries(vtkPolyDataToGraphExample vtkHybrid )
 
 
-ADD_EXECUTABLE(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest.cxx
-vtkUnstructuredGridToGraph.cxx)
-TARGET_LINK_LIBRARIES(vtkUnstructuredGridToGraphTest vtkHybrid )
-ADD_TEST(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest)
+add_executable(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest.cxx vtkUnstructuredGridToGraph.cxx)
+target_link_libraries(vtkUnstructuredGridToGraphTest vtkHybrid )
+add_test(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest)
 
-ADD_EXECUTABLE(vtkPolyDataToGraphTest vtkPolyDataToGraphTest.cxx
-vtkPolyDataToGraph.cxx)
-TARGET_LINK_LIBRARIES(vtkPolyDataToGraphTest vtkHybrid )
-ADD_TEST(vtkPolyDataToGraphTest vtkPolyDataToGraphTest)
+add_executable(vtkPolyDataToGraphTest vtkPolyDataToGraphTest.cxx vtkPolyDataToGraph.cxx)
+target_link_libraries(vtkPolyDataToGraphTest vtkHybrid )
+add_test(vtkPolyDataToGraphTest vtkPolyDataToGraphTest)
