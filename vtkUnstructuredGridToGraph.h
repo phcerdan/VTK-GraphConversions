@@ -15,7 +15,6 @@ class vtkUnstructuredGridToGraph : public vtkGraphAlgorithm
 {
 public:
   
-  vtkTypeRevisionMacro(vtkUnstructuredGridToGraph, vtkGraphAlgorithm);
   static vtkUnstructuredGridToGraph* New();
   
 protected:

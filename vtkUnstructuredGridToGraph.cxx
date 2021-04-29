@@ -14,7 +14,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkUnstructuredGridToGraph, "$Revision: 1.70 $");
 vtkStandardNewMacro(vtkUnstructuredGridToGraph);
 
 int vtkUnstructuredGridToGraph::RequestDataObject(vtkInformation *vtkNotUsed(request),
