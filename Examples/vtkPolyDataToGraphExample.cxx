@@ -15,7 +15,7 @@ int main (int /*argc*/, char ** /*argv[]*/)
 {
   ExampleWithMesh();
   ExampleWithEdges();
-  
+
   return EXIT_SUCCESS;
 }
 

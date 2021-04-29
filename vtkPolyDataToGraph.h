@@ -10,32 +10,32 @@
 class vtkPolyData;
 class vtkIdList;
 
-class vtkPolyDataToGraph : public vtkGraphAlgorithm  
+class vtkPolyDataToGraph : public vtkGraphAlgorithm
 {
 public:
-  
+
   static vtkPolyDataToGraph *New();
   vtkTypeMacro(vtkPolyDataToGraph, vtkGraphAlgorithm);
-  
+
 protected:
   vtkPolyDataToGraph(){}
   ~vtkPolyDataToGraph(){}
-  
+
   virtual int FillInputPortInformation( int port, vtkInformation* info );
-  
+
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  
+
   int RequestDataObject(vtkInformation *vtkNotUsed(request),
                                          vtkInformationVector **inputVector,
                                          vtkInformationVector *outputVector);
-  
-  
+
+
 private:
   vtkPolyDataToGraph(const vtkPolyDataToGraph&);  // Not implemented.
   void operator=(const vtkPolyDataToGraph&);  // Not implemented.
-  
+
   //should not be part of this class
-  bool EdgeExists(vtkSmartPointer<vtkGraph> g, int pointID, int neighborID);  
+  bool EdgeExists(vtkSmartPointer<vtkGraph> g, int pointID, int neighborID);
   void GetConnectedVertices(vtkSmartPointer<vtkPolyData> mesh, int seed, vtkSmartPointer<vtkIdList> connectedVertices);
 };
 

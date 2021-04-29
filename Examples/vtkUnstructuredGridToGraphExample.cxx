@@ -11,7 +11,7 @@
 
 int main (int /*argc*/, char ** /*argv[]*/)
 {
-  
+
   vtkSmartPointer<vtkSphereSource> sphereSource =
       vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->Update();
@@ -26,22 +26,22 @@ int main (int /*argc*/, char ** /*argv[]*/)
   ugWriter->SetFileName("ug.vtu");
   ugWriter->SetInputConnection(delaunay->GetOutputPort());
   ugWriter->Write();
-  
-  vtkSmartPointer<vtkUnstructuredGridToGraph> unstructuredGridToGraphFilter = 
+
+  vtkSmartPointer<vtkUnstructuredGridToGraph> unstructuredGridToGraphFilter =
       vtkSmartPointer<vtkUnstructuredGridToGraph>::New();
   unstructuredGridToGraphFilter->SetInputConnection(delaunay->GetOutputPort());
   unstructuredGridToGraphFilter->Update();
-  
-  vtkSmartPointer<vtkGraphToPolyData> graphToPolyDataFilter = 
+
+  vtkSmartPointer<vtkGraphToPolyData> graphToPolyDataFilter =
       vtkSmartPointer<vtkGraphToPolyData>::New();
   graphToPolyDataFilter->SetInputConnection(unstructuredGridToGraphFilter->GetOutputPort());
   graphToPolyDataFilter->Update();
-  
+
   vtkSmartPointer<vtkXMLPolyDataWriter> pdWriter =
       vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   pdWriter->SetFileName("ugGraph.vtp");
   pdWriter->SetInputConnection(graphToPolyDataFilter->GetOutputPort());
   pdWriter->Write();
-  
+
   return EXIT_SUCCESS;
 }
