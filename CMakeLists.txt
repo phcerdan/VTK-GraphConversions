@@ -39,31 +39,25 @@ endif()
 # Core
 add_library(PolyDataToGraph vtkPolyDataToGraph.cxx)
 target_link_libraries(PolyDataToGraph PUBLIC ${VTK_LIBRARIES})
+target_include_directories(PolyDataToGraph PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>  # <prefix>/include/mylib
+)
 
 add_library(UnstructuredGridToGraph vtkUnstructuredGridToGraph.cxx)
 target_link_libraries(UnstructuredGridToGraph PUBLIC ${VTK_LIBRARIES})
+target_include_directories(UnstructuredGridToGraph PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>  # <prefix>/include/mylib
+)
 
 if(VTKGraphConversions_BUILD_TESTING)
-    enable_testing()
-    add_executable(NewGraphConversions NewGraphConversions.cxx)
-    target_link_libraries(NewGraphConversions PRIVATE ${VTK_LIBRARIES})
-    add_test(NewGraphConversions NewGraphConversions)
-
-    add_executable(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest.cxx)
-    target_link_libraries(vtkUnstructuredGridToGraphTest UnstructuredGridToGraph)
-    add_test(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest)
-
-    add_executable(vtkPolyDataToGraphTest vtkPolyDataToGraphTest.cxx)
-    target_link_libraries(vtkPolyDataToGraphTest PolyDataToGraph)
-    add_test(vtkPolyDataToGraphTest vtkPolyDataToGraphTest)
+  enable_testing()
+  add_subdirectory(Testing)
 endif()
 
 if(VTKGraphConversions_BUILD_EXAMPLES)
-    add_executable(vtkUnstructuredGridToGraphExample vtkUnstructuredGridToGraphExample.cxx)
-    target_link_libraries(vtkUnstructuredGridToGraphExample UnstructuredGridToGraph)
-
-    add_executable(vtkPolyDataToGraphExample vtkPolyDataToGraphExample.cxx)
-    target_link_libraries(vtkPolyDataToGraphExample PolyDataToGraph )
+  add_subdirectory(Examples)
 endif()
 
 

@@ -1,0 +1,11 @@
+add_executable(NewGraphConversionsTest NewGraphConversionsTest.cxx)
+target_link_libraries(NewGraphConversionsTest PRIVATE ${VTK_LIBRARIES})
+add_test(NewGraphConversionsTest NewGraphConversionsTest)
+
+add_executable(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest.cxx)
+target_link_libraries(vtkUnstructuredGridToGraphTest UnstructuredGridToGraph)
+add_test(vtkUnstructuredGridToGraphTest vtkUnstructuredGridToGraphTest)
+
+add_executable(vtkPolyDataToGraphTest vtkPolyDataToGraphTest.cxx)
+target_link_libraries(vtkPolyDataToGraphTest PolyDataToGraph)
+add_test(vtkPolyDataToGraphTest vtkPolyDataToGraphTest)

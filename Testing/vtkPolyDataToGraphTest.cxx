@@ -8,7 +8,7 @@
 
 #include "vtkPolyDataToGraph.h"
 
-int main (int argc, char *argv[])
+int main (int /*argc*/, char ** /*argv[]*/)
 {
   vtkSmartPointer<vtkSphereSource> sphereSource = 
       vtkSmartPointer<vtkSphereSource>::New();

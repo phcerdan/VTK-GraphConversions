@@ -11,7 +11,7 @@
 void ExampleWithMesh();
 void ExampleWithEdges();
 
-int main (int argc, char *argv[])
+int main (int /*argc*/, char ** /*argv[]*/)
 {
   ExampleWithMesh();
   ExampleWithEdges();
