@@ -15,6 +15,7 @@ class vtkPolyDataToGraph : public vtkGraphAlgorithm
 public:
   
   static vtkPolyDataToGraph *New();
+  vtkTypeMacro(vtkPolyDataToGraph, vtkGraphAlgorithm);
   
 protected:
   vtkPolyDataToGraph(){}
