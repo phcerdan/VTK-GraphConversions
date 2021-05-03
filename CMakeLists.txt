@@ -4,6 +4,10 @@ project(VTKGraphConversions
   VERSION 0.1
   LANGUAGES CXX C)
 
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
 include(GNUInstallDirs) # Define CMAKE_INSTALL_xxx: LIBDIR, INCLUDEDIR
 
 # Check first for VTK VERSION
@@ -135,3 +139,4 @@ if(VTKGraphConversions_BUILD_EXAMPLES)
 endif()
 
 
+add_subdirectory(scripts)
